@@ -1,0 +1,9 @@
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/settings", tags=["settings"])
+
+
+@router.get("")
+def get_settings_snapshot() -> dict[str, dict]:
+    return {"settings": {}}
+
