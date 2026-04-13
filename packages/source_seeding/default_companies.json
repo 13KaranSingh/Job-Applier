@@ -1,0 +1,63 @@
+[
+  {
+    "company_name": "Google",
+    "company_slug": "google",
+    "company_type": "big_tech",
+    "prestige_tier": 5,
+    "compensation_tier": 5,
+    "growth_tier": 4,
+    "stability_tier": 5,
+    "role_bias": "swe",
+    "target_priority": 98,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Amazon",
+    "company_slug": "amazon",
+    "company_type": "big_tech",
+    "prestige_tier": 4,
+    "compensation_tier": 4,
+    "growth_tier": 3,
+    "stability_tier": 5,
+    "role_bias": "swe",
+    "target_priority": 88,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Jane Street",
+    "company_slug": "jane-street",
+    "company_type": "quant",
+    "prestige_tier": 5,
+    "compensation_tier": 5,
+    "growth_tier": 5,
+    "stability_tier": 5,
+    "role_bias": "quant",
+    "target_priority": 99,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Citadel Securities",
+    "company_slug": "citadel-securities",
+    "company_type": "quant",
+    "prestige_tier": 5,
+    "compensation_tier": 5,
+    "growth_tier": 5,
+    "stability_tier": 4,
+    "role_bias": "quant",
+    "target_priority": 97,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Stripe",
+    "company_slug": "stripe",
+    "company_type": "startup",
+    "prestige_tier": 4,
+    "compensation_tier": 4,
+    "growth_tier": 4,
+    "stability_tier": 4,
+    "role_bias": "both",
+    "target_priority": 90,
+    "blacklisted": false
+  }
+]
+

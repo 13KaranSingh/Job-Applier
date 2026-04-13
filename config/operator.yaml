@@ -1,0 +1,28 @@
+mode: balanced_mode
+email: karanvir_gurn@yahoo.com
+polling:
+  high_priority_minutes: 3
+  medium_priority_minutes: 10
+  low_priority_minutes: 30
+ranking:
+  min_alert_score: 70
+  min_auto_apply_score: 85
+  min_parser_confidence: 0.80
+  min_automation_confidence: 0.80
+tracks:
+  swe_enabled: true
+  quant_enabled: true
+sources:
+  linkedin_enabled: false
+  workday_enabled: false
+preferences:
+  preferred_locations:
+    - San Francisco Bay Area
+    - New York City
+    - Remote
+  exclude_internships: true
+  allow_mid_level: true
+  max_role_age_days: 7
+presets:
+  default_sort_mode: best_overall
+
