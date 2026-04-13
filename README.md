@@ -12,7 +12,7 @@ The platform is built around a fast discovery-to-decision loop:
 4. Score each job using freshness, fit, compensation, prestige, location, and automation readiness.
 5. Decide whether to auto-apply, queue for review, alert only, or ignore.
 6. Persist state in PostgreSQL.
-7. Project key data into Google Sheets and email notifications.
+7. Project key data into CSV tracker exports and email notifications.
 8. Expose operator controls through FastAPI and the dashboard.
 
 Hard constraints enforced by design:
@@ -69,7 +69,7 @@ Still to finish for full production readiness:
 - Full live scraping implementations for every target source
 - Complete Alembic revisions for every table
 - Playwright submission flows for supported companies
-- Real Google Sheets client integration
+- Real Google Sheets client integration if you choose to add it later
 - Real Yahoo SMTP send pipeline
 - Rich dashboard data wiring and operator actions
 - Full observability, retries, and artifact storage plumbing
@@ -138,7 +138,15 @@ Services:
 curl -X POST http://localhost:8000/sources/seed
 ```
 
-### 4. Inspect health and sources
+### 4. Load fixture jobs, rank them, and export tracker CSVs
+
+```bash
+python -c "from apps.worker.tasks.polling import poll_sources; print(poll_sources())"
+python -c "from apps.worker.tasks.ranking import rank_jobs; print(rank_jobs())"
+python -c "from apps.worker.tasks.sheets_sync import sync_google_sheets; print(sync_google_sheets())"
+```
+
+### 5. Inspect health and sources
 
 ```bash
 curl http://localhost:8000/health
@@ -240,6 +248,32 @@ To generate or run migrations later:
 alembic upgrade head
 ```
 
+## Tracker Output
+
+The human-readable tracker now supports CSV-first operation.
+
+Generated files land in `storage/exports/`:
+
+- `Applications.csv`
+- `TopJobs.csv`
+- `JobFeed.csv`
+- `Failures.csv`
+
+This keeps the operator loop simple and local. A Google Sheets sync layer can still be added later without changing the core ranking or decision pipeline.
+
+## Yahoo Email
+
+Outgoing mail is wired for Yahoo SMTP using:
+
+- `YAHOO_SMTP_USERNAME`
+- `YAHOO_SMTP_APP_PASSWORD`
+
+Current default target:
+
+- `karanvir_gurn@yahoo.com`
+
+If the app password is unset or left as `change-me`, notifications are queued and marked sent logically without opening a live SMTP session. That keeps local development safe.
+
 ## Source Strategy
 
 Primary targets:
@@ -292,7 +326,7 @@ GitHub Actions compile-check workflow:
 
 1. Add full Alembic coverage for all tables.
 2. Replace starter adapters with live HTTP/browser collectors.
-3. Implement real Google Sheets sync.
-4. Implement Yahoo SMTP send and digest tasks.
+3. Implement full live company and ATS collectors.
+4. Harden Yahoo SMTP delivery status and retry behavior.
 5. Implement Playwright application flows with artifacts and confirmation detection.
 6. Wire the dashboard to live API data.

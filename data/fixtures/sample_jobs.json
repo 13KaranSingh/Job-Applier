@@ -1,0 +1,45 @@
+[
+  {
+    "source_slug": "google",
+    "external_job_id": "google-early-career-001",
+    "company_name": "Google",
+    "title": "Software Engineer, Early Career",
+    "location": "New York City",
+    "remote_policy": "hybrid",
+    "posted_hours_ago": 2,
+    "apply_url": "https://careers.google.com/jobs/results/google-early-career-001",
+    "detail_url": "https://careers.google.com/jobs/results/google-early-career-001",
+    "description_text": "Build large-scale products with Python, TypeScript, React, and distributed systems. Early career candidates welcome.",
+    "compensation_text": "$140,000 - $210,000 base salary",
+    "auto_apply_supported": false
+  },
+  {
+    "source_slug": "jane-street",
+    "external_job_id": "js-quant-dev-001",
+    "company_name": "Jane Street",
+    "title": "Quantitative Developer",
+    "location": "New York City",
+    "remote_policy": "onsite",
+    "posted_hours_ago": 4,
+    "apply_url": "https://www.janestreet.com/join-jane-street/position/js-quant-dev-001",
+    "detail_url": "https://www.janestreet.com/join-jane-street/position/js-quant-dev-001",
+    "description_text": "Work on trading systems, Python, C++, probability, low latency systems, and market microstructure.",
+    "compensation_text": "$175,000 - $275,000 base salary plus bonus",
+    "auto_apply_supported": false
+  },
+  {
+    "source_slug": "stripe",
+    "external_job_id": "stripe-frontend-001",
+    "company_name": "Stripe",
+    "title": "Frontend Engineer, New Grad",
+    "location": "San Francisco Bay Area",
+    "remote_policy": "hybrid",
+    "posted_hours_ago": 6,
+    "apply_url": "https://stripe.com/jobs/listing/stripe-frontend-001",
+    "detail_url": "https://stripe.com/jobs/listing/stripe-frontend-001",
+    "description_text": "Ship React, TypeScript, and product UI systems for high-impact teams. Strong frontend focus.",
+    "compensation_text": "$155,000 - $225,000 base salary",
+    "auto_apply_supported": false
+  }
+]
+
