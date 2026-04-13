@@ -58,6 +58,89 @@
     "role_bias": "both",
     "target_priority": 90,
     "blacklisted": false
+  },
+  {
+    "company_name": "Meta",
+    "company_slug": "meta",
+    "company_type": "big_tech",
+    "prestige_tier": 5,
+    "compensation_tier": 5,
+    "growth_tier": 4,
+    "stability_tier": 5,
+    "role_bias": "swe",
+    "target_priority": 93,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Microsoft",
+    "company_slug": "microsoft",
+    "company_type": "big_tech",
+    "prestige_tier": 5,
+    "compensation_tier": 4,
+    "growth_tier": 4,
+    "stability_tier": 5,
+    "role_bias": "swe",
+    "target_priority": 91,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Databricks",
+    "company_slug": "databricks",
+    "company_type": "startup",
+    "prestige_tier": 4,
+    "compensation_tier": 5,
+    "growth_tier": 5,
+    "stability_tier": 3,
+    "role_bias": "both",
+    "target_priority": 92,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Two Sigma",
+    "company_slug": "two-sigma",
+    "company_type": "quant",
+    "prestige_tier": 5,
+    "compensation_tier": 5,
+    "growth_tier": 4,
+    "stability_tier": 4,
+    "role_bias": "quant",
+    "target_priority": 96,
+    "blacklisted": false
+  },
+  {
+    "company_name": "Jump Trading",
+    "company_slug": "jump",
+    "company_type": "quant",
+    "prestige_tier": 5,
+    "compensation_tier": 5,
+    "growth_tier": 4,
+    "stability_tier": 4,
+    "role_bias": "quant",
+    "target_priority": 95,
+    "blacklisted": false
+  },
+  {
+    "company_name": "SIG",
+    "company_slug": "sig",
+    "company_type": "quant",
+    "prestige_tier": 4,
+    "compensation_tier": 4,
+    "growth_tier": 4,
+    "stability_tier": 4,
+    "role_bias": "quant",
+    "target_priority": 90,
+    "blacklisted": false
+  },
+  {
+    "company_name": "DRW",
+    "company_slug": "drw",
+    "company_type": "quant",
+    "prestige_tier": 4,
+    "compensation_tier": 4,
+    "growth_tier": 4,
+    "stability_tier": 4,
+    "role_bias": "quant",
+    "target_priority": 89,
+    "blacklisted": false
   }
 ]
-

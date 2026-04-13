@@ -11,6 +11,7 @@ from apps.api.app.routers import (
     settings,
     sources,
 )
+from packages.db.bootstrap import create_all_tables
 
 app = FastAPI(title="Job Bot API", version="0.1.0")
 
@@ -24,3 +25,7 @@ app.include_router(answers.router)
 app.include_router(resumes.router)
 app.include_router(settings.router)
 
+
+@app.on_event("startup")
+def on_startup() -> None:
+    create_all_tables()
