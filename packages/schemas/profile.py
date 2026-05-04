@@ -22,6 +22,11 @@ class CandidateProfileSchema(BaseModel):
         default_factory=lambda: ["San Francisco Bay Area", "New York City", "Remote"]
     )
     target_modes: list[str] = Field(default_factory=lambda: ["swe", "quant"])
+    target_companies: list[str] = Field(default_factory=list)
+    excluded_companies: list[str] = Field(default_factory=list)
+    skill_inventory: list[str] = Field(default_factory=list)
+    years_experience_total: float | None = None
+    minimum_base_salary_usd: int | None = None
     experience_band: str = "new_grad_to_mid"
     resume_variants: list[str] = Field(
         default_factory=lambda: [
@@ -39,4 +44,3 @@ class AnswerLibrarySchema(BaseModel):
     answer_text: str
     requires_human_review: bool = False
     active: bool = True
-

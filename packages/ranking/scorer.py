@@ -159,7 +159,8 @@ def score_job(
     compensation = _score_compensation(company_metadata, job.base_salary_max_usd)
     location_fit = _score_location(job.location_normalized, profile.preferred_locations, job.remote_policy)
     skills_fit = skill_overlap_score(
-        job.description_text, profile.resume_variants + ["react", "typescript", "python", "c++"]
+        job.description_text,
+        profile.skill_inventory + ["react", "typescript", "python", "c++", "java", "javascript"],
     )
     family_fit = role_family_fit(role_family, profile.target_modes)
     source_quality = _source_quality(job.company_name)
@@ -211,7 +212,8 @@ def score_job(
         weighted_total = quant_score
     else:
         weighted_total = (swe_score + quant_score) / 2
-    final_total = bounded(weighted_total * max(0.35, interview_prob), 0.0, 100.0)
+    expected_outcome = weighted_total * max(0.35, interview_prob)
+    final_total = bounded((weighted_total * 0.72) + (expected_outcome * 0.28), 0.0, 100.0)
     explanations = [
         *reason_if(recency, 9, "Fresh posting"),
         *reason_if(title_fit, 8, "Strong title fit"),
@@ -250,4 +252,3 @@ def score_job(
         quant_score=round(quant_score, 2),
         interview_probability=interview_prob,
     )
-

@@ -42,7 +42,6 @@ def test_high_quality_recent_google_job_scores_for_review_or_better() -> None:
     )
     metadata = CompanyMetadata(target_priority=98, prestige_tier=5, compensation_tier=5, role_bias="swe")
     score = score_job(job, profile, metadata, operating_mode=OperatingMode.BALANCED)
-    assert score.total_score >= 55
+    assert score.total_score >= 70
     assert score.recommended_action in {"AUTO_APPLY_NOW", "QUEUE_FOR_REVIEW", "ALERT_ONLY"}
     assert "Strong title fit" in score.explanations
-
