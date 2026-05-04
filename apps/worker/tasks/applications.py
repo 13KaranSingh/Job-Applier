@@ -6,17 +6,30 @@ from sqlalchemy import select
 
 from packages.db.models.application import Application, ApplicationEvent
 from packages.db.models.job import Job, JobScore
+from packages.db.models.profile import CandidateProfile
 from packages.db.session import SessionLocal
 
 
 @shared_task(name="apps.worker.tasks.applications.run_auto_apply")
 def run_auto_apply(limit: int = 10) -> dict[str, int]:
     with SessionLocal() as session:
+        profile = session.scalars(select(CandidateProfile).limit(1)).first()
+        preferences = (profile.profile_json if profile else {}).get("application_preferences", {})
+        if not preferences.get("auto_apply_enabled", False):
+            return {"submitted": 0}
         candidates = (
             session.execute(
                 select(Job, JobScore)
                 .join(JobScore, JobScore.job_id == Job.id)
-                .where(JobScore.recommended_action == "AUTO_APPLY_NOW", Job.status == "active")
+                .where(
+                    JobScore.recommended_action == "AUTO_APPLY_NOW",
+                    Job.status == "active",
+                    Job.auto_apply_supported.is_(True),
+                    Job.parser_confidence >= 0.8,
+                    Job.automation_confidence >= 0.8,
+                    JobScore.exclusion_penalty == 0,
+                    JobScore.friction_penalty > -4,
+                )
                 .limit(limit)
             ).all()
         )

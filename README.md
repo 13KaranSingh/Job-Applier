@@ -158,6 +158,9 @@ Seed your local profile and resume assets:
 python -c "from apps.worker.tasks.profile import seed_profile; print(seed_profile())"
 ```
 
+Auto-apply is controlled from the local profile under `application_preferences.auto_apply_enabled`.
+Even when enabled, the worker still requires high score, supported automation, parser confidence, automation confidence, no exclusion penalty, and low friction before submitting.
+
 ### 5. Inspect health and sources
 
 ```bash

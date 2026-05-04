@@ -61,8 +61,8 @@ DEFAULT_ANSWER_LIBRARY = [
         "answer_key": "years_cpp",
         "category": "skills",
         "prompt_patterns": ["years of c++", "c++ experience", "cpp experience"],
-        "answer_text": "Review resume and confirm before submitting.",
-        "requires_human_review": True,
+        "answer_text": "4-5 years",
+        "requires_human_review": False,
     },
 ]
 
@@ -124,4 +124,3 @@ def seed_local_profile(session: Session, path: str = "config/local/profile.json"
 
     session.commit()
     return {"profiles_seeded": 1, "resumes_seeded": resumes_seeded, "answers_seeded": answers_seeded}
-
