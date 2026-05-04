@@ -146,6 +146,18 @@ python -c "from apps.worker.tasks.ranking import rank_jobs; print(rank_jobs())"
 python -c "from apps.worker.tasks.sheets_sync import sync_google_sheets; print(sync_google_sheets())"
 ```
 
+### Local profile and resumes
+
+Personal profile data should live in `config/local/profile.json`. That path is ignored by git.
+
+Resume PDFs should live in `storage/resumes/`. That directory ignores PDFs by default so resumes are not committed.
+
+Seed your local profile and resume assets:
+
+```bash
+python -c "from apps.worker.tasks.profile import seed_profile; print(seed_profile())"
+```
+
 ### 5. Inspect health and sources
 
 ```bash

@@ -16,5 +16,7 @@ build/
 storage/screenshots/*
 storage/html_snapshots/*
 storage/exports/*
+storage/resumes/*
+config/local/*.json
 !.gitkeep
-
+!config/local/.gitkeep
