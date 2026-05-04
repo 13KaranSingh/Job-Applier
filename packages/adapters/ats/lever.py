@@ -36,7 +36,7 @@ class LeverAdapter(GreenhouseAdapter):
         return payload
 
     def normalize_job(self, raw_job: dict[str, Any]) -> JobSchema:
-        company = normalize_company(raw_job.get("company_name", "unknown"))
+        company = normalize_company(raw_job.get("company_name") or self.config.get("company_name", "unknown"))
         title = normalize_title(raw_job.get("text", ""))
         categories = raw_job.get("categories") or {}
         location_raw = categories.get("location") or "Unknown"
