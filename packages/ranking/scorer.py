@@ -212,8 +212,7 @@ def score_job(
         weighted_total = quant_score
     else:
         weighted_total = (swe_score + quant_score) / 2
-    expected_outcome = weighted_total * max(0.35, interview_prob)
-    final_total = bounded((weighted_total * 0.72) + (expected_outcome * 0.28), 0.0, 100.0)
+    final_total = bounded(weighted_total + (interview_prob * 5), 0.0, 100.0)
     explanations = [
         *reason_if(recency, 9, "Fresh posting"),
         *reason_if(title_fit, 8, "Strong title fit"),
