@@ -109,7 +109,7 @@ class JobService:
         )
         existing = session.scalars(select(JobScore).where(JobScore.job_id == job.id)).first()
         if existing is None:
-            existing = JobScore(job_id=str(job.id), total_score=0, recommended_resume_variant="resume_swe_general.pdf", recommended_action="IGNORE")
+            existing = JobScore(job_id=job.id, total_score=0, recommended_resume_variant="resume_swe_general.pdf", recommended_action="IGNORE")
         existing.total_score = score.total_score
         existing.recency_score = score.recency_score
         existing.title_fit_score = score.title_fit_score
@@ -139,7 +139,7 @@ class JobService:
         if job is None:
             return None
         application = Application(
-            job_id=str(job.id),
+            job_id=job.id,
             application_mode="manual_handoff",
             status="PENDING",
             resume_variant="resume_swe_general.pdf" if job.role_family != "quant" else "resume_quant_swe.pdf",

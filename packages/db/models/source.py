@@ -1,5 +1,7 @@
+import uuid
+
 from sqlalchemy import Boolean, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from packages.db.base import Base
@@ -23,9 +25,8 @@ class Source(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class SourceHealth(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "source_health"
 
-    source_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    source_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     last_success_at: Mapped[str | None] = mapped_column(String(64))
     last_failure_at: Mapped[str | None] = mapped_column(String(64))
     recent_error_summary: Mapped[str | None] = mapped_column(Text)
-

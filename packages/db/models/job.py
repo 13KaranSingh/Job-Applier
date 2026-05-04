@@ -1,5 +1,7 @@
+import uuid
+
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from packages.db.base import Base
@@ -9,7 +11,7 @@ from packages.db.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 class Job(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "jobs"
 
-    source_id: Mapped[str] = mapped_column(String(64), ForeignKey("sources.id"), nullable=False, index=True)
+    source_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("sources.id"), nullable=False, index=True)
     external_job_id: Mapped[str | None] = mapped_column(String(255))
     canonical_job_key: Mapped[str] = mapped_column(String(512), unique=True, nullable=False)
     company_name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
@@ -46,8 +48,8 @@ class Job(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class JobAlias(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "job_aliases"
 
-    canonical_job_id: Mapped[str] = mapped_column(String(64), ForeignKey("jobs.id"), nullable=False, index=True)
-    source_id: Mapped[str] = mapped_column(String(64), ForeignKey("sources.id"), nullable=False)
+    canonical_job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id"), nullable=False, index=True)
+    source_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("sources.id"), nullable=False)
     external_job_id: Mapped[str | None] = mapped_column(String(255))
     alias_url: Mapped[str | None] = mapped_column(Text)
 
@@ -55,7 +57,7 @@ class JobAlias(UUIDPrimaryKeyMixin, Base):
 class JobScore(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "job_scores"
 
-    job_id: Mapped[str] = mapped_column(String(64), ForeignKey("jobs.id"), nullable=False, index=True)
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id"), nullable=False, index=True)
     total_score: Mapped[float] = mapped_column(Float, nullable=False)
     recency_score: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
     title_fit_score: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
@@ -76,4 +78,3 @@ class JobScore(UUIDPrimaryKeyMixin, Base):
     recommended_resume_variant: Mapped[str] = mapped_column(String(255), nullable=False)
     recommended_action: Mapped[str] = mapped_column(String(50), nullable=False)
     reasons_json: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
-

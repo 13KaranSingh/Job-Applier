@@ -1,5 +1,7 @@
+import uuid
+
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from packages.db.base import Base
@@ -9,7 +11,7 @@ from packages.db.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "applications"
 
-    job_id: Mapped[str] = mapped_column(String(64), ForeignKey("jobs.id"), nullable=False, index=True)
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id"), nullable=False, index=True)
     application_mode: Mapped[str] = mapped_column(String(50), nullable=False)
     status: Mapped[str] = mapped_column(String(64), nullable=False)
     resume_variant: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -25,9 +27,8 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class ApplicationEvent(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "application_events"
 
-    application_id: Mapped[str] = mapped_column(
-        String(64), ForeignKey("applications.id"), nullable=False, index=True
+    application_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("applications.id"), nullable=False, index=True
     )
     event_type: Mapped[str] = mapped_column(String(128), nullable=False)
     payload_json: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
-
