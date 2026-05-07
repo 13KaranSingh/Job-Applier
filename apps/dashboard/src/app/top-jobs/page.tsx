@@ -2,6 +2,7 @@ import { LayoutShell } from "../../components/layout-shell";
 import { EmptyState } from "../../components/empty-state";
 import { ScoreBar } from "../../components/score-bar";
 import { StatusPill } from "../../components/status-pill";
+import { ActionButton } from "../../components/action-button";
 import { formatDate, getTopJobs } from "../../lib/api";
 
 export const dynamic = "force-dynamic";
@@ -49,9 +50,13 @@ export default async function TopJobsPage() {
                   </td>
                   <td className="px-4 py-4">
                     <StatusPill label={job.recommended_action} tone="warn" />
-                    <a className="mt-3 block text-sm font-medium text-[var(--accent)]" href={job.apply_url}>
-                      Open job
-                    </a>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <ActionButton label="Rerank" endpoint={`/api/jobs/${job.id}/rerank`} />
+                      <ActionButton label="Queue Apply" endpoint={`/api/jobs/${job.id}/apply`} tone="accent" />
+                      <a className="rounded-md border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100" href={job.apply_url}>
+                        Open
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}

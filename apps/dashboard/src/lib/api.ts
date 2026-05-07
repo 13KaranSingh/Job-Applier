@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.API_BASE_URL ?? "http://127.0.0.1:8000";
+export const API_BASE_URL = process.env.API_BASE_URL ?? "http://127.0.0.1:8000";
 
 export type AnalyticsSummary = {
   jobs_discovered: number;
@@ -116,4 +116,3 @@ export function formatDate(value: string | null): string {
     minute: "2-digit",
   }).format(new Date(value));
 }
-

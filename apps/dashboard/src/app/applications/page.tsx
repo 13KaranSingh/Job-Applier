@@ -1,4 +1,5 @@
 import { LayoutShell } from "../../components/layout-shell";
+import { ActionButton } from "../../components/action-button";
 import { EmptyState } from "../../components/empty-state";
 import { StatusPill } from "../../components/status-pill";
 import { formatDate, getApplications } from "../../lib/api";
@@ -22,6 +23,7 @@ export default async function ApplicationsPage() {
                 <th className="px-4 py-3">Resume</th>
                 <th className="px-4 py-3">Submitted</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-200">
@@ -33,6 +35,9 @@ export default async function ApplicationsPage() {
                   <td className="px-4 py-3">{formatDate(application.submitted_at)}</td>
                   <td className="px-4 py-3">
                     <StatusPill label={application.status} tone={application.status === "CONFIRMED" ? "good" : "neutral"} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <ActionButton label="Retry" endpoint={`/api/applications/${application.id}/retry`} />
                   </td>
                 </tr>
               ))}

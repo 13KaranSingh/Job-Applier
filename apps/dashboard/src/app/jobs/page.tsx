@@ -1,4 +1,5 @@
 import { LayoutShell } from "../../components/layout-shell";
+import { ActionButton } from "../../components/action-button";
 import { EmptyState } from "../../components/empty-state";
 import { StatusPill } from "../../components/status-pill";
 import { formatDate, getJobs } from "../../lib/api";
@@ -22,6 +23,7 @@ export default async function JobsPage() {
                 <th className="px-4 py-3">Location</th>
                 <th className="px-4 py-3">Seen</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-200">
@@ -37,6 +39,12 @@ export default async function JobsPage() {
                   <td className="px-4 py-3 text-stone-600">{formatDate(job.first_seen_at)}</td>
                   <td className="px-4 py-3">
                     <StatusPill label={job.status} tone={job.status === "active" ? "good" : "neutral"} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2">
+                      <ActionButton label="Rerank" endpoint={`/api/jobs/${job.id}/rerank`} />
+                      <ActionButton label="Apply" endpoint={`/api/jobs/${job.id}/apply`} tone="accent" />
+                    </div>
                   </td>
                 </tr>
               ))}
