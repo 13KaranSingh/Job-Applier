@@ -1,7 +1,8 @@
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
-from packages.db.models.application import Application
+from packages.core.utils.datetime import utcnow
+from packages.db.models.application import Application, ApplicationEvent
 from packages.db.models.job import Job, JobScore
 from packages.ranking.decision import classify_decision
 from packages.ranking.queue import sort_top_jobs
@@ -138,13 +139,32 @@ class JobService:
         job = session.get(Job, job_id)
         if job is None:
             return None
+        existing = session.scalars(select(Application).where(Application.job_id == job.id)).first()
+        if existing is not None:
+            return {"job_id": job_id, "application_id": str(existing.id), "status": existing.status}
+        score = session.scalars(select(JobScore).where(JobScore.job_id == job.id)).first()
+        resume_variant = (
+            score.recommended_resume_variant
+            if score is not None and score.recommended_resume_variant
+            else "resume_swe_general.pdf" if job.role_family != "quant" else "resume_quant_swe.pdf"
+        )
         application = Application(
             job_id=job.id,
             application_mode="manual_handoff",
-            status="PENDING",
-            resume_variant="resume_swe_general.pdf" if job.role_family != "quant" else "resume_quant_swe.pdf",
+            status="MANUAL_REVIEW_REQUIRED",
+            resume_variant=resume_variant,
+            started_at=utcnow(),
+            notes="Manual handoff created from dashboard/API apply action.",
         )
         session.add(application)
+        session.flush()
+        session.add(
+            ApplicationEvent(
+                application_id=application.id,
+                event_type="MANUAL_REVIEW_REQUIRED",
+                payload_json={"job_id": job_id, "apply_url": job.apply_url},
+            )
+        )
         session.commit()
         session.refresh(application)
         return {"job_id": job_id, "application_id": str(application.id), "status": application.status}

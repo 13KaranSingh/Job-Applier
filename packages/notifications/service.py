@@ -1,4 +1,5 @@
 import smtplib
+from datetime import timedelta
 from email.message import EmailMessage
 from typing import Any
 
@@ -6,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from apps.api.app.config import get_settings
 from packages.core.constants import TARGET_EMAIL
+from packages.core.utils.datetime import utcnow
 from packages.db.models.notification import Notification
 from packages.notifications.yahoo_mailer import build_message
 
@@ -14,7 +16,29 @@ class NotificationService:
     def __init__(self) -> None:
         self.settings = get_settings()
 
-    def enqueue(self, session: Session, notification_type: str, subject: str, payload_json: dict[str, Any]) -> Notification:
+    def enqueue(
+        self,
+        session: Session,
+        notification_type: str,
+        subject: str,
+        payload_json: dict[str, Any],
+        suppression_hours: int = 24,
+    ) -> Notification:
+        event_key = payload_json.get("event_key") or payload_json.get("job_id")
+        if event_key:
+            cutoff = utcnow() - timedelta(hours=suppression_hours)
+            existing_items = (
+                session.query(Notification)
+                .filter(
+                    Notification.notification_type == notification_type,
+                    Notification.created_at >= cutoff,
+                )
+                .all()
+            )
+            for item in existing_items:
+                existing_key = item.payload_json.get("event_key") or item.payload_json.get("job_id")
+                if existing_key == event_key:
+                    return item
         notification = Notification(
             notification_type=notification_type,
             target_email=TARGET_EMAIL,
@@ -57,4 +81,3 @@ class NotificationService:
         with smtplib.SMTP_SSL("smtp.mail.yahoo.com", 465, timeout=30) as smtp:
             smtp.login(username, password)
             smtp.send_message(message)
-

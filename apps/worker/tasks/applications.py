@@ -35,6 +35,9 @@ def run_auto_apply(limit: int = 10) -> dict[str, int]:
         )
         submitted = 0
         for job, score in candidates:
+            existing = session.scalars(select(Application).where(Application.job_id == job.id)).first()
+            if existing is not None:
+                continue
             application = Application(
                 job_id=job.id,
                 application_mode="assisted_auto_apply",

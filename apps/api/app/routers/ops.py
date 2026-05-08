@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 
 from apps.worker.tasks.notifications import send_top_job_alerts
+from apps.worker.tasks.applications import run_auto_apply
 from apps.worker.tasks.polling import poll_sources
 from apps.worker.tasks.profile import seed_profile
 from apps.worker.tasks.ranking import decide_actions, rank_jobs
@@ -34,6 +35,7 @@ OPERATIONS: dict[str, Callable[[], dict[str, Any] | str]] = {
     "decide": decide_actions,
     "export-csv": sync_google_sheets,
     "send-alerts": send_top_job_alerts,
+    "auto-apply": run_auto_apply,
     "full-refresh": _run_full_refresh,
 }
 

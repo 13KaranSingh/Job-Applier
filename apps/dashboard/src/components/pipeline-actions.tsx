@@ -6,6 +6,7 @@ const actions = [
   { label: "Full Refresh", operation: "full-refresh", tone: "accent" as const },
   { label: "Poll Sources", operation: "poll", tone: "neutral" as const },
   { label: "Rank Jobs", operation: "rank", tone: "neutral" as const },
+  { label: "Auto Apply", operation: "auto-apply", tone: "danger" as const },
   { label: "Export CSV", operation: "export-csv", tone: "neutral" as const },
   { label: "Send Alerts", operation: "send-alerts", tone: "danger" as const },
 ];
