@@ -56,23 +56,25 @@ Implemented now:
 - SQLAlchemy model set
 - Alembic scaffold with initial revision placeholder
 - Source seeding from company metadata
-- Starter adapter framework for company and ATS boards
+- Starter adapter framework for company, ATS, and generic JSON-LD careers pages
 - Normalization, compensation parsing, canonical dedup key generation
 - Ranking engine with SWE, quant, and balanced scoring
 - Decision classification and top-job queue sorting
-- DB-backed API routes for sources, jobs, applications, analytics, profile, answers, and resumes
-- Dashboard shell pages
-- Unit tests for ranking, queue sorting, dedup, and source seeding
+- DB-backed API routes for sources, jobs, applications, analytics, profile, answers, resumes, and ops
+- Dashboard pages wired to live API data
+- Dashboard actions for source management, rerank, manual apply, retry, CSV export, and pipeline runs
+- CSV tracker exports for Applications, Top Jobs, Job Feed, and Failures
+- Yahoo SMTP notification queue with duplicate suppression
+- Idempotent manual handoff and auto-apply attempts
+- Unit tests for ranking, queue sorting, dedup, source seeding, ATS adapters, generic adapter, and CSV sync
 
 Still to finish for full production readiness:
 
-- Full live scraping implementations for every target source
 - Complete Alembic revisions for every table
-- Playwright submission flows for supported companies
+- More direct live adapters beyond ATS/generic careers ingestion
+- Production-grade Playwright submission flows for supported companies
 - Real Google Sheets client integration if you choose to add it later
-- Real Yahoo SMTP send pipeline
-- Rich dashboard data wiring and operator actions
-- Full observability, retries, and artifact storage plumbing
+- Full observability dashboards, retries, and artifact storage plumbing
 
 ## Scoring Model
 
@@ -138,9 +140,21 @@ Services:
 curl -X POST http://localhost:8000/sources/seed
 ```
 
-### 4. Load fixture jobs, rank them, and export tracker CSVs
+### 4. Run the pipeline
+
+Open the dashboard Overview page and use:
+
+- `Full Refresh`: seed local profile, poll sources, rank jobs, decide actions, export CSVs
+- `Poll Sources`: pull fixture and configured live sources
+- `Rank Jobs`: recompute scores
+- `Auto Apply`: run the guarded auto-apply worker
+- `Export CSV`: regenerate tracker exports
+- `Send Alerts`: send queued top-job Yahoo alerts
+
+Equivalent shell commands are still available:
 
 ```bash
+python -c "from apps.worker.tasks.profile import seed_profile; print(seed_profile())"
 python -c "from apps.worker.tasks.polling import poll_sources; print(poll_sources())"
 python -c "from apps.worker.tasks.ranking import rank_jobs; print(rank_jobs())"
 python -c "from apps.worker.tasks.sheets_sync import sync_google_sheets; print(sync_google_sheets())"
@@ -191,9 +205,11 @@ Key controls:
 ### Sources
 
 - `GET /sources`
+- `POST /sources`
 - `POST /sources/seed`
 - `POST /sources/{id}/enable`
 - `POST /sources/{id}/disable`
+- `PUT /sources/{id}`
 
 ### Jobs
 
@@ -222,6 +238,17 @@ Key controls:
 ### Analytics
 
 - `GET /analytics/summary`
+
+### Operator pipeline
+
+- `POST /ops/seed-profile`
+- `POST /ops/poll`
+- `POST /ops/rank`
+- `POST /ops/decide`
+- `POST /ops/auto-apply`
+- `POST /ops/export-csv`
+- `POST /ops/send-alerts`
+- `POST /ops/full-refresh`
 
 ## Local Development
 
@@ -307,6 +334,14 @@ Initial seeded companies include:
 - Citadel Securities
 - Stripe
 
+Add real live sources from the dashboard Sources page:
+
+- Greenhouse source: set `source_type=ats` and `greenhouse_token`
+- Lever source: set `source_type=ats` and `lever_slug`
+- Generic careers page: set `career_url` for a page with JSON-LD `JobPosting` data
+
+The poller uses exact adapters first and falls back to the generic careers adapter when a source has `career_url`.
+
 ## Safety and Guardrails
 
 - Never use LinkedIn as a source.
@@ -324,6 +359,8 @@ Current tests cover:
 - ranking behavior
 - queue sorting
 - source seeding behavior
+- ATS and generic adapter parsing
+- CSV tracker sync
 
 Run:
 
@@ -337,11 +374,10 @@ GitHub Actions compile-check workflow:
 
 - `.github/workflows/ci.yml`
 
-## Recommended Next Steps
+## Remaining Production Work
 
 1. Add full Alembic coverage for all tables.
-2. Replace starter adapters with live HTTP/browser collectors.
-3. Implement full live company and ATS collectors.
-4. Harden Yahoo SMTP delivery status and retry behavior.
-5. Implement Playwright application flows with artifacts and confirmation detection.
-6. Wire the dashboard to live API data.
+2. Add more direct company adapters for target boards that do not expose Greenhouse, Lever, or JSON-LD.
+3. Implement production Playwright form submission flows with screenshots, HTML snapshots, and confirmation detection.
+4. Add background Celery beat schedules for continuous polling/ranking/exporting.
+5. Add richer observability dashboards and notification retry/backoff.
