@@ -6,6 +6,7 @@ from apps.api.app.routers import (
     applications,
     health,
     jobs,
+    ops,
     profile,
     resumes,
     settings,
@@ -20,6 +21,7 @@ app.include_router(sources.router)
 app.include_router(jobs.router)
 app.include_router(applications.router)
 app.include_router(analytics.router)
+app.include_router(ops.router)
 app.include_router(profile.router)
 app.include_router(answers.router)
 app.include_router(resumes.router)

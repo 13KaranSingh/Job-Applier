@@ -89,12 +89,15 @@ def poll_sources() -> dict[str, int]:
                 if health is None:
                     health = SourceHealth(source_id=source.id, status="ok")
                 health.status = "ok"
+                health.last_success_at = utcnow().isoformat()
+                health.recent_error_summary = None
                 session.add(health)
             except Exception as exc:
                 health = session.scalars(select(SourceHealth).where(SourceHealth.source_id == source.id)).first()
                 if health is None:
                     health = SourceHealth(source_id=source.id, status="degraded")
                 health.status = "degraded"
+                health.last_failure_at = utcnow().isoformat()
                 health.recent_error_summary = str(exc)
                 session.add(health)
         session.commit()

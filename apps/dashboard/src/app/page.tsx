@@ -2,6 +2,7 @@ import { LayoutShell } from "../components/layout-shell";
 import { StatCard } from "../components/stat-card";
 import { EmptyState } from "../components/empty-state";
 import { ExportLinks } from "../components/export-links";
+import { PipelineActions } from "../components/pipeline-actions";
 import { ScoreBar } from "../components/score-bar";
 import { StatusPill } from "../components/status-pill";
 import { formatDate, getAnalyticsSummary, getSources, getTopJobs } from "../lib/api";
@@ -17,7 +18,15 @@ export default async function OverviewPage() {
   const degraded = sources.filter((source) => !source.enabled).length;
 
   return (
-    <LayoutShell title="Overview" actions={<ExportLinks />}>
+    <LayoutShell
+      title="Overview"
+      actions={
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <PipelineActions />
+          <ExportLinks />
+        </div>
+      }
+    >
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Jobs Discovered" value={String(summary.jobs_discovered)} />
         <StatCard label="Top Jobs" value={String(summary.jobs_above_70)} tone="accent" />
