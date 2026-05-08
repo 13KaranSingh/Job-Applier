@@ -4,6 +4,7 @@ from celery import shared_task
 from sqlalchemy import select
 
 from packages.adapters.registry import ADAPTER_REGISTRY
+from packages.adapters.generic import GenericCareersAdapter
 from packages.db.bootstrap import create_all_tables
 from packages.db.bootstrap import seed_default_sources
 from packages.db.fixtures import load_sample_jobs
@@ -15,9 +16,12 @@ from packages.core.utils.datetime import utcnow
 
 async def _discover_source(source: Source) -> list:
     adapter_class = ADAPTER_REGISTRY.get(source.slug)
+    if adapter_class is None and source.config_json.get("career_url"):
+        adapter_class = GenericCareersAdapter
     if adapter_class is None:
         return []
-    adapter = adapter_class(source.config_json)
+    config = {**source.config_json, "source_slug": source.slug}
+    adapter = adapter_class(config)
     raw_jobs = await adapter.discover_jobs()
     return [adapter.normalize_job(raw_job) for raw_job in raw_jobs]
 

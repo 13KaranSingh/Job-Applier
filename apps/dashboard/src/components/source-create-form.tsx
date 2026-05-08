@@ -14,11 +14,12 @@ export function SourceCreateForm() {
   const [sourceType, setSourceType] = useState("company");
   const [boardToken, setBoardToken] = useState("");
   const [companySlug, setCompanySlug] = useState("");
+  const [careerUrl, setCareerUrl] = useState("");
 
   return (
     <section className="mb-4 rounded-lg border border-black/5 bg-white/85 p-4 shadow-sm">
       <h3 className="font-serif text-xl">Add Live Source</h3>
-      <div className="mt-3 grid gap-3 md:grid-cols-[1fr_160px_1fr_1fr_120px]">
+      <div className="mt-3 grid gap-3 md:grid-cols-[1fr_140px_1fr_1fr_1fr_120px]">
         <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Company name" className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm" />
         <select value={sourceType} onChange={(event) => setSourceType(event.target.value)} className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm">
           <option value="company">Company</option>
@@ -27,6 +28,7 @@ export function SourceCreateForm() {
         </select>
         <input value={boardToken} onChange={(event) => setBoardToken(event.target.value)} placeholder="Greenhouse token" className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm" />
         <input value={companySlug} onChange={(event) => setCompanySlug(event.target.value)} placeholder="Lever slug" className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm" />
+        <input value={careerUrl} onChange={(event) => setCareerUrl(event.target.value)} placeholder="Careers URL" className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm" />
         <button
           type="button"
           disabled={isPending || !name}
@@ -45,12 +47,14 @@ export function SourceCreateForm() {
                     company_name: name,
                     board_token: boardToken,
                     company_slug: companySlug,
+                    career_url: careerUrl,
                   },
                 }),
               });
               setName("");
               setBoardToken("");
               setCompanySlug("");
+              setCareerUrl("");
               router.refresh();
             });
           }}

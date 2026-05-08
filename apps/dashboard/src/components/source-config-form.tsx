@@ -11,6 +11,7 @@ export function SourceConfigForm({ source }: { source: SourceItem }) {
   const [boardToken, setBoardToken] = useState(String(source.config_json.board_token ?? ""));
   const [companySlug, setCompanySlug] = useState(String(source.config_json.company_slug ?? ""));
   const [companyName, setCompanyName] = useState(String(source.config_json.company_name ?? ""));
+  const [careerUrl, setCareerUrl] = useState(String(source.config_json.career_url ?? ""));
 
   return (
     <div className="grid gap-2">
@@ -32,6 +33,12 @@ export function SourceConfigForm({ source }: { source: SourceItem }) {
         placeholder="Company display name"
         className="w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-xs"
       />
+      <input
+        value={careerUrl}
+        onChange={(event) => setCareerUrl(event.target.value)}
+        placeholder="Careers URL"
+        className="w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-xs"
+      />
       <button
         type="button"
         disabled={isPending}
@@ -44,6 +51,7 @@ export function SourceConfigForm({ source }: { source: SourceItem }) {
                 board_token: boardToken,
                 company_slug: companySlug,
                 company_name: companyName,
+                career_url: careerUrl,
               }),
             });
             router.refresh();

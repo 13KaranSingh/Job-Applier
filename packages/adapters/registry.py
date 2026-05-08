@@ -1,5 +1,6 @@
 from packages.adapters.ats.greenhouse import GreenhouseAdapter
 from packages.adapters.ats.lever import LeverAdapter
+from packages.adapters.generic import GenericCareersAdapter
 from packages.adapters.companies.amazon import AmazonAdapter
 from packages.adapters.companies.citadel import CitadelAdapter
 from packages.adapters.companies.citadel_securities import CitadelSecuritiesAdapter
@@ -18,6 +19,7 @@ from packages.adapters.companies.stripe import StripeAdapter
 from packages.adapters.companies.two_sigma import TwoSigmaAdapter
 
 ADAPTER_REGISTRY = {
+    "generic-careers": GenericCareersAdapter,
     "amazon": AmazonAdapter,
     "google": GoogleAdapter,
     "meta": MetaAdapter,
