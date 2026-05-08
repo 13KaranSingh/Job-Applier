@@ -34,6 +34,22 @@ def seed_sources(db: Session = Depends(get_db)) -> dict[str, int]:
     return {"created": service.seed_defaults(db)}
 
 
+@router.post("")
+def create_source(payload: dict = Body(...), db: Session = Depends(get_db)) -> dict:
+    source = service.create_source(db, payload)
+    return {
+        "id": str(source.id),
+        "name": source.name,
+        "slug": source.slug,
+        "enabled": source.enabled,
+        "source_type": source.source_type,
+        "priority_weight": source.priority_weight,
+        "polling_interval_seconds": source.polling_interval_seconds,
+        "supports_auto_apply": source.supports_auto_apply,
+        "config_json": source.config_json,
+    }
+
+
 @router.post("/{source_id}/enable")
 def enable_source(source_id: str, db: Session = Depends(get_db)) -> dict[str, str]:
     source = service.set_enabled(db, source_id, True)

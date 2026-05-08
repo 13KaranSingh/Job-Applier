@@ -1,5 +1,6 @@
 import { LayoutShell } from "../../components/layout-shell";
 import { EmptyState } from "../../components/empty-state";
+import { ExportLinks } from "../../components/export-links";
 import { ScoreBar } from "../../components/score-bar";
 import { StatusPill } from "../../components/status-pill";
 import { ActionButton } from "../../components/action-button";
@@ -13,7 +14,7 @@ export default async function TopJobsPage() {
   return (
     <LayoutShell
       title="Top Jobs"
-      actions={<StatusPill label={`${jobs.length} active matches`} tone={jobs.length > 0 ? "good" : "neutral"} />}
+      actions={<div className="flex flex-wrap items-center gap-2"><StatusPill label={`${jobs.length} active matches`} tone={jobs.length > 0 ? "good" : "neutral"} /><ExportLinks /></div>}
     >
       <div className="overflow-hidden rounded-lg border border-black/5 bg-white/85 shadow-sm">
         {jobs.length === 0 ? (

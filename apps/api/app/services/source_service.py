@@ -9,6 +9,23 @@ class SourceService:
     def list_sources(self, session: Session) -> list[Source]:
         return list(session.scalars(select(Source).order_by(Source.priority_weight.desc(), Source.name)).all())
 
+    def create_source(self, session: Session, payload: dict) -> Source:
+        source = Source(
+            name=payload["name"],
+            slug=payload["slug"],
+            source_type=payload.get("source_type", "company"),
+            enabled=payload.get("enabled", True),
+            polling_interval_seconds=int(payload.get("polling_interval_seconds", 600)),
+            priority_weight=int(payload.get("priority_weight", 5)),
+            supports_auto_apply=payload.get("supports_auto_apply", False),
+            requires_login=payload.get("requires_login", False),
+            config_json=payload.get("config_json", {}),
+        )
+        session.add(source)
+        session.commit()
+        session.refresh(source)
+        return source
+
     def set_enabled(self, session: Session, source_id: str, enabled: bool) -> Source | None:
         source = session.get(Source, source_id)
         if source is None:

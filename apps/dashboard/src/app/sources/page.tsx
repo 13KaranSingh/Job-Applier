@@ -1,6 +1,7 @@
 import { LayoutShell } from "../../components/layout-shell";
 import { ActionButton } from "../../components/action-button";
 import { SourceConfigForm } from "../../components/source-config-form";
+import { SourceCreateForm } from "../../components/source-create-form";
 import { StatusPill } from "../../components/status-pill";
 import { getSources } from "../../lib/api";
 
@@ -11,6 +12,7 @@ export default async function SourcesPage() {
 
   return (
     <LayoutShell title="Sources" actions={<StatusPill label={`${sources.length} configured`} />}>
+      <SourceCreateForm />
       <div className="overflow-hidden rounded-lg border border-black/5 bg-white/85 shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase text-stone-500">
