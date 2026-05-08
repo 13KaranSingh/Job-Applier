@@ -66,6 +66,24 @@ export type ProfilePayload = {
   profile: Record<string, unknown> | null;
 };
 
+export type AnswerItem = {
+  id: string;
+  answer_key: string;
+  category: string;
+  prompt_patterns: string[];
+  answer_text: string;
+  requires_human_review: boolean;
+  active: boolean;
+};
+
+export type ResumeItem = {
+  id: string;
+  variant_name: string;
+  file_path: string;
+  active: boolean;
+  metadata_json: Record<string, unknown>;
+};
+
 async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     cache: "no-store",
@@ -103,6 +121,16 @@ export async function getApplications(): Promise<ApplicationItem[]> {
 
 export async function getProfile(): Promise<ProfilePayload> {
   return fetchJson<ProfilePayload>("/profile");
+}
+
+export async function getAnswers(): Promise<AnswerItem[]> {
+  const payload = await fetchJson<{ items: AnswerItem[] }>("/answers");
+  return payload.items;
+}
+
+export async function getResumes(): Promise<ResumeItem[]> {
+  const payload = await fetchJson<{ items: ResumeItem[] }>("/resumes");
+  return payload.items;
 }
 
 export function formatDate(value: string | null): string {

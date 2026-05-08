@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from apps.api.app.deps import get_db
@@ -48,3 +48,19 @@ def disable_source(source_id: str, db: Session = Depends(get_db)) -> dict[str, s
     if source is None:
         raise HTTPException(status_code=404, detail="Source not found")
     return {"source_id": source_id, "status": "disabled"}
+
+
+@router.put("/{source_id}")
+def update_source(source_id: str, payload: dict = Body(...), db: Session = Depends(get_db)) -> dict:
+    source = service.update_config(db, source_id, payload)
+    if source is None:
+        raise HTTPException(status_code=404, detail="Source not found")
+    return {
+        "id": str(source.id),
+        "name": source.name,
+        "slug": source.slug,
+        "enabled": source.enabled,
+        "polling_interval_seconds": source.polling_interval_seconds,
+        "priority_weight": source.priority_weight,
+        "config_json": source.config_json,
+    }

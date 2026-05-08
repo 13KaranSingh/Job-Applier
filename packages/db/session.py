@@ -5,6 +5,5 @@ from apps.api.app.config import get_settings
 
 settings = get_settings()
 
-engine = create_engine(settings.database_url, future=True)
+engine = create_engine(settings.database_url, future=True, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, future=True)
-

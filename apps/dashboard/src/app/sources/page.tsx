@@ -1,5 +1,6 @@
 import { LayoutShell } from "../../components/layout-shell";
 import { ActionButton } from "../../components/action-button";
+import { SourceConfigForm } from "../../components/source-config-form";
 import { StatusPill } from "../../components/status-pill";
 import { getSources } from "../../lib/api";
 
@@ -19,6 +20,7 @@ export default async function SourcesPage() {
               <th className="px-4 py-3">Polling</th>
               <th className="px-4 py-3">Priority</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Config</th>
               <th className="px-4 py-3">Actions</th>
             </tr>
           </thead>
@@ -34,6 +36,9 @@ export default async function SourcesPage() {
                 <td className="px-4 py-3 text-stone-700">{source.priority_weight}</td>
                 <td className="px-4 py-3">
                   <StatusPill label={source.enabled ? "enabled" : "disabled"} tone={source.enabled ? "good" : "neutral"} />
+                </td>
+                <td className="px-4 py-3">
+                  <SourceConfigForm source={source} />
                 </td>
                 <td className="px-4 py-3">
                   <ActionButton
