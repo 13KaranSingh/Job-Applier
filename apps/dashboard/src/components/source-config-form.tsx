@@ -12,19 +12,26 @@ export function SourceConfigForm({ source }: { source: SourceItem }) {
   const [companySlug, setCompanySlug] = useState(String(source.config_json.company_slug ?? ""));
   const [companyName, setCompanyName] = useState(String(source.config_json.company_name ?? ""));
   const [careerUrl, setCareerUrl] = useState(String(source.config_json.career_url ?? ""));
+  const [atsType, setAtsType] = useState(String(source.config_json.ats_type ?? ""));
 
   return (
     <div className="grid gap-2">
       <input
         value={boardToken}
         onChange={(event) => setBoardToken(event.target.value)}
-        placeholder="Greenhouse board token"
+        placeholder="Board token / ATS token"
         className="w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-xs"
       />
       <input
         value={companySlug}
         onChange={(event) => setCompanySlug(event.target.value)}
         placeholder="Lever company slug"
+        className="w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-xs"
+      />
+      <input
+        value={atsType}
+        onChange={(event) => setAtsType(event.target.value)}
+        placeholder="ATS type"
         className="w-full rounded-md border border-stone-300 bg-white px-2 py-1.5 text-xs"
       />
       <input
@@ -52,6 +59,7 @@ export function SourceConfigForm({ source }: { source: SourceItem }) {
                 company_slug: companySlug,
                 company_name: companyName,
                 career_url: careerUrl,
+                ats_type: atsType,
               }),
             });
             router.refresh();

@@ -50,7 +50,7 @@ class SourceService:
         if source is None:
             return None
         config = dict(source.config_json or {})
-        for key in ["board_token", "company_slug", "company_name", "career_url"]:
+        for key in ["board_token", "company_slug", "company_name", "career_url", "ats_type"]:
             if key in payload:
                 value = payload[key]
                 if value in (None, ""):

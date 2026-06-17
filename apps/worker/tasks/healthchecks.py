@@ -10,10 +10,18 @@ from packages.db.models.source import Source, SourceHealth
 from packages.db.session import SessionLocal
 
 
-async def _check_source(source: Source) -> dict[str, str]:
+def _select_adapter_class(source: Source):
+    config = source.config_json or {}
+    if config.get("career_url") and not (config.get("board_token") or config.get("company_slug")):
+        return GenericCareersAdapter
     adapter_class = ADAPTER_REGISTRY.get(source.slug)
-    if adapter_class is None and source.config_json.get("career_url"):
-        adapter_class = GenericCareersAdapter
+    if adapter_class is None and config.get("career_url"):
+        return GenericCareersAdapter
+    return adapter_class
+
+
+async def _check_source(source: Source) -> dict[str, str]:
+    adapter_class = _select_adapter_class(source)
     if adapter_class is None:
         return {"status": "not_supported", "error": "No adapter registered"}
     config = {**source.config_json, "source_slug": source.slug}

@@ -13,14 +13,17 @@ def create_all_tables() -> None:
 
 def seed_default_sources(session: Session) -> int:
     created = 0
-    existing = {
-        slug for slug in session.scalars(select(Source.slug)).all()
-    }
+    existing_sources = {source.slug: source for source in session.scalars(select(Source)).all()}
     for source_payload in build_default_sources():
-        if source_payload["slug"] in existing:
+        existing = existing_sources.get(source_payload["slug"])
+        if existing is None:
+            session.add(Source(**source_payload))
+            created += 1
             continue
-        session.add(Source(**source_payload))
-        created += 1
+        config = dict(existing.config_json or {})
+        for key, value in source_payload["config_json"].items():
+            config.setdefault(key, value)
+        existing.config_json = config
+        session.add(existing)
     session.commit()
     return created
-

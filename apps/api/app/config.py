@@ -18,9 +18,9 @@ class Settings(BaseSettings):
     storage_root: str = Field(default="storage", alias="STORAGE_ROOT")
     operator_config_path: str = Field(default="config/operator.yaml", alias="OPERATOR_CONFIG_PATH")
     playwright_headless: bool = Field(default=True, alias="PLAYWRIGHT_HEADLESS")
+    enable_fixture_jobs: bool = Field(default=False, alias="ENABLE_FIXTURE_JOBS")
 
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

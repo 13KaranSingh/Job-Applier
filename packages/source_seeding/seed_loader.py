@@ -2,6 +2,14 @@ import json
 from pathlib import Path
 from typing import Any
 
+DEFAULT_SOURCE_CONFIGS: dict[str, dict[str, Any]] = {
+    "amazon": {"career_url": "https://www.amazon.jobs/en/search"},
+    "google": {"career_url": "https://www.google.com/about/careers/applications/jobs/results/"},
+    "jane-street": {"career_url": "https://www.janestreet.com/join-jane-street/open-roles/"},
+    "stripe": {"career_url": "https://stripe.com/jobs/search"},
+    "databricks": {"career_url": "https://www.databricks.com/company/careers/open-positions"},
+}
+
 
 def load_default_companies() -> list[dict[str, Any]]:
     seed_path = Path(__file__).with_name("default_companies.json")
@@ -28,6 +36,8 @@ def build_default_sources() -> list[dict[str, Any]]:
                     "compensation_tier": company["compensation_tier"],
                     "role_bias": company["role_bias"],
                     "blacklisted": company["blacklisted"],
+                    "company_name": company["company_name"],
+                    **DEFAULT_SOURCE_CONFIGS.get(company["company_slug"], {}),
                 },
             }
         )

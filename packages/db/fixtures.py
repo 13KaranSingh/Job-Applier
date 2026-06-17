@@ -5,6 +5,7 @@ from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from packages.db.models.application import Application
 from packages.adapters.parsing.compensation import parse_compensation
 from packages.adapters.parsing.normalization import (
     canonical_job_key,
@@ -75,3 +76,36 @@ def load_sample_jobs(session: Session, fixture_path: str = "data/fixtures/sample
     session.commit()
     return created
 
+
+def purge_sample_jobs(session: Session, fixture_path: str = "data/fixtures/sample_jobs.json") -> int:
+    path = Path(fixture_path)
+    if not path.exists():
+        return 0
+    payload = json.loads(path.read_text())
+    sources = {source.slug: source for source in session.scalars(select(Source)).all()}
+    removed = 0
+    for item in payload:
+        source = sources.get(item["source_slug"])
+        if source is None:
+            continue
+        title_normalized = normalize_title(item["title"])
+        location_normalized = normalize_location(item["location"])
+        job_key = canonical_job_key(
+            item["company_name"], title_normalized, location_normalized, item["external_job_id"]
+        )
+        existing = session.scalars(select(Job).where(Job.canonical_job_key == job_key)).first()
+        if existing is None:
+            continue
+        referenced = session.scalars(select(Application).where(Application.job_id == existing.id)).first()
+        if referenced is not None:
+            existing.status = "closed"
+            payload = dict(existing.raw_payload_json or {})
+            payload["fixture_archived"] = True
+            existing.raw_payload_json = payload
+            session.add(existing)
+            removed += 1
+            continue
+        session.delete(existing)
+        removed += 1
+    session.commit()
+    return removed
