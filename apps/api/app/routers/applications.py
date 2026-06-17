@@ -15,13 +15,20 @@ def list_applications(db: Session = Depends(get_db)) -> dict[str, list[dict]]:
         "items": [
             {
                 "id": str(item.id),
-                "job_id": item.job_id,
+                "job_id": str(item.job_id),
                 "status": item.status,
                 "application_mode": item.application_mode,
                 "resume_variant": item.resume_variant,
                 "submitted_at": item.submitted_at,
+                "company_name": job.company_name,
+                "title_normalized": job.title_normalized,
+                "location_normalized": job.location_normalized,
+                "apply_url": job.apply_url,
+                "notes": item.notes,
+                "failure_code": item.failure_code,
+                "failure_stage": item.failure_stage,
             }
-            for item in items
+            for item, job in items
         ]
     }
 

@@ -1,6 +1,7 @@
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
+from packages.core.enums import SortMode
 from packages.core.utils.datetime import utcnow
 from packages.db.models.application import Application, ApplicationEvent
 from packages.db.models.job import Job, JobScore
@@ -19,7 +20,15 @@ class JobService:
     def get_job(self, session: Session, job_id: str) -> Job | None:
         return session.get(Job, job_id)
 
-    def list_top_jobs(self, session: Session, limit: int = 50) -> list[dict]:
+    def list_top_jobs(
+        self,
+        session: Session,
+        limit: int = 50,
+        sort_mode: SortMode = SortMode.BEST_OVERALL,
+        track: str | None = None,
+        remote_only: bool = False,
+        auto_apply_only: bool = False,
+    ) -> list[dict]:
         rows = session.execute(
             select(Job, JobScore)
             .join(JobScore, JobScore.job_id == Job.id)
@@ -33,6 +42,8 @@ class JobService:
                 "company_name": job.company_name,
                 "title_normalized": job.title_normalized,
                 "location_normalized": job.location_normalized,
+                "remote_policy": job.remote_policy,
+                "role_family": job.role_family,
                 "status": job.status,
                 "apply_url": job.apply_url,
                 "source_name": job.company_name,
@@ -48,10 +59,17 @@ class JobService:
                 "company_priority_score": score.company_priority_score,
                 "location_fit_score": score.location_fit_score,
                 "recommended_action": score.recommended_action,
+                "auto_apply_supported": job.auto_apply_supported,
             }
             for job, score in rows
         ]
-        return sort_top_jobs(items)
+        if track in {"swe", "quant", "both"}:
+            items = [item for item in items if item["role_family"] == track or (track != "both" and item["role_family"] == "both")]
+        if remote_only:
+            items = [item for item in items if item["remote_policy"] == "remote"]
+        if auto_apply_only:
+            items = [item for item in items if item["auto_apply_supported"]]
+        return sort_top_jobs(items, sort_mode=sort_mode)
 
     def rerank_job(self, session: Session, job_id: str) -> dict[str, str] | None:
         job = session.get(Job, job_id)

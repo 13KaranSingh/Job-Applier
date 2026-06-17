@@ -13,6 +13,8 @@ export type TopJob = {
   company_name: string;
   title_normalized: string;
   location_normalized: string | null;
+  remote_policy: string | null;
+  role_family: string;
   status: string;
   apply_url: string;
   source_name: string;
@@ -66,6 +68,13 @@ export type ApplicationItem = {
   application_mode: string;
   resume_variant: string;
   submitted_at: string | null;
+  company_name: string;
+  title_normalized: string;
+  location_normalized: string | null;
+  apply_url: string;
+  notes: string | null;
+  failure_code: string | null;
+  failure_stage: string | null;
 };
 
 export type ProfilePayload = {
@@ -105,8 +114,27 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   return payload.summary;
 }
 
-export async function getTopJobs(): Promise<TopJob[]> {
-  const payload = await fetchJson<{ items: TopJob[] }>("/jobs/top");
+export async function getTopJobs(params?: {
+  sort_mode?: string;
+  track?: string;
+  remote_only?: boolean;
+  auto_apply_only?: boolean;
+}): Promise<TopJob[]> {
+  const search = new URLSearchParams();
+  if (params?.sort_mode) {
+    search.set("sort_mode", params.sort_mode);
+  }
+  if (params?.track) {
+    search.set("track", params.track);
+  }
+  if (params?.remote_only) {
+    search.set("remote_only", "true");
+  }
+  if (params?.auto_apply_only) {
+    search.set("auto_apply_only", "true");
+  }
+  const suffix = search.size > 0 ? `?${search.toString()}` : "";
+  const payload = await fetchJson<{ items: TopJob[] }>(`/jobs/top${suffix}`);
   return payload.items;
 }
 

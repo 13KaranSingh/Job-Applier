@@ -19,6 +19,7 @@ export default async function ApplicationsPage() {
             <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase text-stone-500">
               <tr>
                 <th className="px-4 py-3">Application</th>
+                <th className="px-4 py-3">Role</th>
                 <th className="px-4 py-3">Mode</th>
                 <th className="px-4 py-3">Resume</th>
                 <th className="px-4 py-3">Submitted</th>
@@ -30,6 +31,12 @@ export default async function ApplicationsPage() {
               {applications.map((application) => (
                 <tr key={application.id}>
                   <td className="px-4 py-3 font-mono text-xs">{application.id}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-semibold">{application.company_name}</p>
+                    <a href={application.apply_url} className="text-xs text-[var(--accent)]">
+                      {application.title_normalized}
+                    </a>
+                  </td>
                   <td className="px-4 py-3">{application.application_mode}</td>
                   <td className="px-4 py-3">{application.resume_variant}</td>
                   <td className="px-4 py-3">{formatDate(application.submitted_at)}</td>

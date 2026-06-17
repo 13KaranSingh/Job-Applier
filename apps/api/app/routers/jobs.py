@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from apps.api.app.deps import get_db
 from apps.api.app.services.job_service import JobService
+from packages.core.enums import SortMode
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 service = JobService()
@@ -29,8 +30,22 @@ def list_jobs(db: Session = Depends(get_db)) -> dict[str, list[dict]]:
 
 
 @router.get("/top")
-def list_top_jobs(db: Session = Depends(get_db)) -> dict[str, list[dict]]:
-    return {"items": service.list_top_jobs(db)}
+def list_top_jobs(
+    db: Session = Depends(get_db),
+    sort_mode: SortMode = Query(default=SortMode.BEST_OVERALL),
+    track: str | None = Query(default=None),
+    remote_only: bool = Query(default=False),
+    auto_apply_only: bool = Query(default=False),
+) -> dict[str, list[dict]]:
+    return {
+        "items": service.list_top_jobs(
+            db,
+            sort_mode=sort_mode,
+            track=track,
+            remote_only=remote_only,
+            auto_apply_only=auto_apply_only,
+        )
+    }
 
 
 @router.get("/{job_id}")

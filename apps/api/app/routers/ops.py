@@ -3,6 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
+from apps.worker.tasks.healthchecks import healthcheck_sources
 from apps.worker.tasks.notifications import send_top_job_alerts
 from apps.worker.tasks.applications import run_auto_apply
 from apps.worker.tasks.polling import poll_sources
@@ -18,12 +19,14 @@ def _run_full_refresh() -> dict[str, Any]:
     polling = poll_sources()
     ranking = rank_jobs()
     decisions = decide_actions()
+    health = healthcheck_sources()
     exports = sync_google_sheets()
     return {
         "profile": profile,
         "polling": polling,
         "ranking": ranking,
         "decisions": decisions,
+        "health": health,
         "exports": exports,
     }
 
@@ -33,6 +36,7 @@ OPERATIONS: dict[str, Callable[[], dict[str, Any] | str]] = {
     "poll": poll_sources,
     "rank": rank_jobs,
     "decide": decide_actions,
+    "healthcheck": healthcheck_sources,
     "export-csv": sync_google_sheets,
     "send-alerts": send_top_job_alerts,
     "auto-apply": run_auto_apply,
