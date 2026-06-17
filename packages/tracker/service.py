@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Any
+from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from apps.api.app.config import get_settings
@@ -20,16 +21,19 @@ class TrackerService:
         top_jobs_rows = self._top_jobs_rows(session)
         job_feed_rows = self._job_feed_rows(session)
         failures_rows = [row for row in applications_rows if row["status"].startswith("FAILED")]
+        daily_stats_rows = self._daily_stats_rows(session)
         files = {
             "applications": self.export_root / "Applications.csv",
             "top_jobs": self.export_root / "TopJobs.csv",
             "job_feed": self.export_root / "JobFeed.csv",
             "failures": self.export_root / "Failures.csv",
+            "daily_stats": self.export_root / "DailyStats.csv",
         }
         write_csv(files["applications"], applications_rows)
         write_csv(files["top_jobs"], top_jobs_rows)
         write_csv(files["job_feed"], job_feed_rows)
         write_csv(files["failures"], failures_rows)
+        write_csv(files["daily_stats"], daily_stats_rows)
         return {name: str(path) for name, path in files.items()}
 
     def _application_rows(self, session: Session) -> list[dict[str, Any]]:
@@ -98,3 +102,44 @@ class TrackerService:
             for job in jobs
         ]
 
+    def _daily_stats_rows(self, session: Session) -> list[dict[str, Any]]:
+        today = datetime.now(UTC).date().isoformat()
+        jobs_discovered = session.scalar(select(func.count()).select_from(Job)) or 0
+        jobs_scored = session.scalar(select(func.count()).select_from(JobScore)) or 0
+        jobs_above_70 = session.scalar(select(func.count()).select_from(JobScore).where(JobScore.total_score >= 70)) or 0
+        jobs_above_85 = session.scalar(select(func.count()).select_from(JobScore).where(JobScore.total_score >= 85)) or 0
+        applications_submitted = (
+            session.scalar(
+                select(func.count()).select_from(Application).where(Application.status.in_(["SUBMITTED", "CONFIRMED"]))
+            )
+            or 0
+        )
+        applications_failed = (
+            session.scalar(select(func.count()).select_from(Application).where(Application.status.like("FAILED%"))) or 0
+        )
+        review_queue_count = (
+            session.scalar(select(func.count()).select_from(JobScore).where(JobScore.recommended_action == "QUEUE_FOR_REVIEW"))
+            or 0
+        )
+        top_company_row = session.execute(
+            select(Job.company_name, func.count(Job.id).label("count"))
+            .group_by(Job.company_name)
+            .order_by(func.count(Job.id).desc())
+        ).first()
+        top_company = top_company_row[0] if top_company_row else ""
+        return [
+            {
+                "date": today,
+                "jobs_discovered": jobs_discovered,
+                "jobs_scored": jobs_scored,
+                "jobs_above_70": jobs_above_70,
+                "jobs_above_85": jobs_above_85,
+                "applications_submitted": applications_submitted,
+                "applications_failed": applications_failed,
+                "review_queue_count": review_queue_count,
+                "avg_time_to_discovery_minutes": "",
+                "avg_time_to_apply_minutes": "",
+                "top_source": top_company,
+                "top_company": top_company,
+            }
+        ]

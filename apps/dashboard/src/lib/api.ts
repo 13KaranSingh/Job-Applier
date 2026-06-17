@@ -51,6 +51,12 @@ export type SourceItem = {
   polling_interval_seconds: number;
   supports_auto_apply: boolean;
   config_json: Record<string, unknown>;
+  health: {
+    status: string;
+    last_success_at: string | null;
+    last_failure_at: string | null;
+    recent_error_summary: string | null;
+  } | null;
 };
 
 export type ApplicationItem = {

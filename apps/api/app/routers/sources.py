@@ -10,7 +10,7 @@ service = SourceService()
 
 @router.get("")
 def list_sources(db: Session = Depends(get_db)) -> dict[str, list[dict]]:
-    items = service.list_sources(db)
+    items = service.list_sources_with_health(db)
     return {
         "items": [
             {
@@ -23,8 +23,16 @@ def list_sources(db: Session = Depends(get_db)) -> dict[str, list[dict]]:
                 "polling_interval_seconds": item.polling_interval_seconds,
                 "supports_auto_apply": item.supports_auto_apply,
                 "config_json": item.config_json,
+                "health": {
+                    "status": health.status,
+                    "last_success_at": health.last_success_at,
+                    "last_failure_at": health.last_failure_at,
+                    "recent_error_summary": health.recent_error_summary,
+                }
+                if health
+                else None,
             }
-            for item in items
+            for item, health in items
         ]
     }
 

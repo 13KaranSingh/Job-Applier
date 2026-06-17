@@ -1,4 +1,4 @@
-const exports = ["TopJobs.csv", "JobFeed.csv", "Applications.csv", "Failures.csv"];
+const exports = ["TopJobs.csv", "JobFeed.csv", "Applications.csv", "Failures.csv", "DailyStats.csv"];
 
 export function ExportLinks() {
   return (
@@ -15,4 +15,3 @@ export function ExportLinks() {
     </div>
   );
 }
-

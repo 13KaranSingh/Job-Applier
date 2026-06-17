@@ -4,7 +4,7 @@ import httpx
 
 from packages.adapters.base import BaseSourceAdapter
 from packages.adapters.parsing.compensation import parse_compensation
-from packages.adapters.parsing.html import extract_text
+from packages.adapters.parsing.html import extract_job_links, extract_text
 from packages.adapters.parsing.jsonld import extract_jsonld_blocks
 from packages.adapters.parsing.normalization import (
     canonical_job_key,
@@ -40,6 +40,20 @@ class GenericCareersAdapter(BaseSourceAdapter):
                     continue
                 if candidate.get("@type") == "JobPosting":
                     postings.append({**candidate, "source_html_text": extract_text(html)})
+        if postings:
+            return postings
+        for link in extract_job_links(html, str(career_url)):
+            postings.append(
+                {
+                    "@type": "JobPosting",
+                    "title": link["title"],
+                    "url": link["url"],
+                    "description": "",
+                    "company_name": self.config.get("company_name", "Unknown"),
+                    "parser_strategy": "html_links",
+                    "source_html_text": "",
+                }
+            )
         return postings
 
     def normalize_job(self, raw_job: dict[str, Any]) -> JobSchema:
@@ -73,12 +87,12 @@ class GenericCareersAdapter(BaseSourceAdapter):
             posted_at_source=None,
             apply_url=str(detail_url),
             detail_url=str(detail_url),
-            description_text=description,
+            description_text=description or title,
             compensation_text=description if compensation.compensation_confidence > 0 else None,
             base_salary_min_usd=compensation.base_salary_min_usd,
             base_salary_max_usd=compensation.base_salary_max_usd,
             auto_apply_supported=False,
-            parser_confidence=0.72,
+            parser_confidence=0.72 if raw_job.get("parser_strategy") != "html_links" else 0.58,
             automation_confidence=0.0,
             status="active",
         )
@@ -105,7 +119,7 @@ class GenericCareersAdapter(BaseSourceAdapter):
         return {"status": "ok"}
 
     def extract_metadata(self, raw_job: dict[str, Any]) -> dict[str, Any]:
-        return {"parser_strategy": "jsonld"}
+        return {"parser_strategy": raw_job.get("parser_strategy", "jsonld")}
 
     def _location(self, raw_job: dict[str, Any]) -> str:
         location = raw_job.get("jobLocation")
@@ -121,4 +135,3 @@ class GenericCareersAdapter(BaseSourceAdapter):
                 ]
                 return ", ".join(str(part) for part in parts if part)
         return str(self.config.get("default_location") or "Unknown")
-

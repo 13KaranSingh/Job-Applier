@@ -37,7 +37,18 @@ export default async function SourcesPage() {
                 <td className="px-4 py-3 text-stone-700">{Math.round(source.polling_interval_seconds / 60)} min</td>
                 <td className="px-4 py-3 text-stone-700">{source.priority_weight}</td>
                 <td className="px-4 py-3">
-                  <StatusPill label={source.enabled ? "enabled" : "disabled"} tone={source.enabled ? "good" : "neutral"} />
+                  <div className="grid gap-2">
+                    <StatusPill label={source.enabled ? "enabled" : "disabled"} tone={source.enabled ? "good" : "neutral"} />
+                    <StatusPill
+                      label={source.health?.status ?? "not checked"}
+                      tone={source.health?.status === "ok" ? "good" : source.health?.status === "degraded" ? "warn" : "neutral"}
+                    />
+                    {source.health?.recent_error_summary ? (
+                      <p className="max-w-[220px] truncate text-xs text-red-700" title={source.health.recent_error_summary}>
+                        {source.health.recent_error_summary}
+                      </p>
+                    ) : null}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <SourceConfigForm source={source} />

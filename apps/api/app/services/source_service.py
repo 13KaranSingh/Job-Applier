@@ -1,13 +1,22 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from packages.db.models.source import Source
+from packages.db.models.source import Source, SourceHealth
 from packages.db.bootstrap import seed_default_sources
 
 
 class SourceService:
     def list_sources(self, session: Session) -> list[Source]:
         return list(session.scalars(select(Source).order_by(Source.priority_weight.desc(), Source.name)).all())
+
+    def list_sources_with_health(self, session: Session) -> list[tuple[Source, SourceHealth | None]]:
+        return list(
+            session.execute(
+                select(Source, SourceHealth)
+                .outerjoin(SourceHealth, SourceHealth.source_id == Source.id)
+                .order_by(Source.priority_weight.desc(), Source.name)
+            ).all()
+        )
 
     def create_source(self, session: Session, payload: dict) -> Source:
         source = Source(
