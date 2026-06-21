@@ -36,7 +36,11 @@ def send_top_job_alerts(limit: int = 5) -> dict[str, int]:
             session.execute(
                 select(Job, JobScore)
                 .join(JobScore, JobScore.job_id == Job.id)
-                .where(JobScore.total_score >= 70, Job.status == "active")
+                .where(
+                    JobScore.total_score >= 70,
+                    Job.status == "active",
+                    JobScore.recommended_action != "IGNORE",
+                )
                 .limit(limit)
             ).all()
         )

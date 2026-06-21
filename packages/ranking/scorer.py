@@ -74,6 +74,48 @@ def _score_location(location: str | None, preferred_locations: list[str], remote
     return 2.0
 
 
+def _score_track_signals(role_family: str, description: str) -> float:
+    lowered = description.lower()
+    quant_signals = [
+        "market microstructure",
+        "financial instruments",
+        "time series",
+        "feature engineering",
+        "model building",
+        "market making",
+        "low latency",
+        "trading systems",
+        "probability",
+        "statistics",
+        "strategy",
+        "strategies",
+        "trading",
+        "research",
+        "pricing",
+        "models",
+    ]
+    swe_signals = [
+        "distributed systems",
+        "frontend",
+        "front end",
+        "full stack",
+        "backend",
+        "api",
+        "cloud",
+        "react",
+        "typescript",
+        "python",
+        "infrastructure",
+        "platform",
+        "product",
+    ]
+    signals = quant_signals if role_family == "quant" else swe_signals
+    if role_family == "both":
+        signals = quant_signals + swe_signals
+    matches = sum(1 for signal in signals if signal in lowered)
+    return min(12.0, matches * 1.5)
+
+
 def _source_quality(source_name: str) -> float:
     lowered = source_name.lower()
     if any(item in lowered for item in ["greenhouse", "lever", "google", "amazon", "jane street", "citadel"]):
@@ -124,7 +166,15 @@ def select_resume_variant(role_family: str, description_text: str) -> str:
     return "resume_swe_general.pdf"
 
 
-def recommended_action(total_score: float, parser_confidence: float, automation_confidence: float, exclusion_penalty: float, friction_penalty: float, duplicate: bool = False, blacklisted: bool = False) -> str:
+def recommended_action(
+    total_score: float,
+    parser_confidence: float,
+    automation_confidence: float,
+    exclusion_penalty: float,
+    friction_penalty: float,
+    duplicate: bool = False,
+    blacklisted: bool = False,
+) -> str:
     if blacklisted or duplicate or exclusion_penalty <= -10:
         return DecisionClass.IGNORE.value
     if (
@@ -135,7 +185,7 @@ def recommended_action(total_score: float, parser_confidence: float, automation_
         and friction_penalty > -4
     ):
         return DecisionClass.AUTO_APPLY_NOW.value
-    if 70 <= total_score < 85 or automation_confidence >= 0.6 or parser_confidence >= 0.6:
+    if 70 <= total_score < 85 or automation_confidence >= 0.6:
         return DecisionClass.QUEUE_FOR_REVIEW.value
     if total_score >= 55:
         return DecisionClass.ALERT_ONLY.value
@@ -158,10 +208,11 @@ def score_job(
     prestige = _score_prestige(company_metadata)
     compensation = _score_compensation(company_metadata, job.base_salary_max_usd)
     location_fit = _score_location(job.location_normalized, profile.preferred_locations, job.remote_policy)
-    skills_fit = skill_overlap_score(
+    profile_skills_fit = skill_overlap_score(
         job.description_text,
         profile.skill_inventory + ["react", "typescript", "python", "c++", "java", "javascript"],
     )
+    skills_fit = max(profile_skills_fit, _score_track_signals(role_family, job.description_text))
     family_fit = role_family_fit(role_family, profile.target_modes)
     source_quality = _source_quality(job.company_name)
     automation = _automation_readiness(
@@ -210,6 +261,14 @@ def score_job(
         weighted_total = swe_score
     elif operating_mode == OperatingMode.QUANT_PRIORITY:
         weighted_total = quant_score
+    elif role_family == "swe":
+        weighted_total = swe_score
+    elif role_family == "quant":
+        weighted_total = quant_score
+    elif company_metadata.role_bias == "swe":
+        weighted_total = (0.7 * swe_score) + (0.3 * quant_score)
+    elif company_metadata.role_bias == "quant":
+        weighted_total = (0.3 * swe_score) + (0.7 * quant_score)
     else:
         weighted_total = (swe_score + quant_score) / 2
     final_total = bounded(weighted_total + (interview_prob * 5), 0.0, 100.0)

@@ -32,7 +32,11 @@ class JobService:
         rows = session.execute(
             select(Job, JobScore)
             .join(JobScore, JobScore.job_id == Job.id)
-            .where(Job.status == "active", JobScore.total_score >= 70)
+            .where(
+                Job.status == "active",
+                JobScore.total_score >= 70,
+                JobScore.recommended_action != "IGNORE",
+            )
             .order_by(desc(JobScore.total_score), desc(Job.posted_at_source))
             .limit(limit)
         ).all()

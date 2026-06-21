@@ -66,7 +66,7 @@ class TrackerService:
         rows: list[dict[str, Any]] = []
         results = session.execute(select(Job, JobScore).join(JobScore, JobScore.job_id == Job.id)).all()
         for job, score in results:
-            if score.total_score < 70 or job.status != "active":
+            if score.total_score < 70 or job.status != "active" or score.recommended_action == "IGNORE":
                 continue
             rows.append(
                 {
