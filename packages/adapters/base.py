@@ -7,6 +7,7 @@ from packages.schemas.job import JobSchema
 class BaseSourceAdapter(ABC):
     source_name: str
     source_slug: str
+    prefer_direct: bool = False
 
     @abstractmethod
     async def discover_jobs(self) -> list[dict[str, Any]]:
@@ -35,4 +36,3 @@ class BaseSourceAdapter(ABC):
     @abstractmethod
     def extract_metadata(self, raw_job: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
-

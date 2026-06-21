@@ -17,9 +17,11 @@ from packages.core.utils.datetime import utcnow
 
 def _select_adapter_class(source: Source):
     config = source.config_json or {}
+    adapter_class = ADAPTER_REGISTRY.get(source.slug)
+    if adapter_class is not None and getattr(adapter_class, "prefer_direct", False):
+        return adapter_class
     if config.get("career_url") and not (config.get("board_token") or config.get("company_slug")):
         return GenericCareersAdapter
-    adapter_class = ADAPTER_REGISTRY.get(source.slug)
     if adapter_class is None and config.get("career_url"):
         return GenericCareersAdapter
     return adapter_class
